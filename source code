@@ -1,0 +1,608 @@
+Unnamed PL/SQL code block: Use of Control structure and Exception handling is mandatory. Write a PL/SQL
+block of code for the following requirements:- Schema: 1. Borrower(Rollno, Name, DOI, NameofBook, Status)
+2. Fine(Roll_no,sDate,Amt) 
+ Accept roll_no & name of book from user.
+ Check the number of days (from date of issue), if days are between 15 to 30 then fine amount will be Rs 5per day.
+ If no. of days>30, per day fine will be Rs 50 per day & for days less than 30, Rs. 5 per day.
+ After submitting the book, status will change from I to R.
+ If condition of fine is true, then details will be stored into fine table.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PL SQL code:
+
+
+drop procedure if exists p_fine;
+
+    delimiter //
+
+    create procedure p_fine(IN rno int,IN  bname varchar(20))
+    begin
+
+       declare d1 date;    
+       declare daycnt int;
+       declare fine_amt int;
+
+   
+        SELECT DateofIssue into d1 FROM Borrower
+      WHERE Roll_no = rno and book= bname;
+     
+       select DATEDIFF(now(),d1) into daycnt;
+       
+         if(daycnt >= 15 and daycnt <= 30) then
+         
+               set fine_amt := daycnt * 5;
+           
+                 insert into Fine(Roll_no,sDate,Amt) values (rno,now(),fine_amt);
+                                                   
+                 update Borrower set status = 'R' where Roll_no = rno;
+                 
+       ELSEIF(daycnt > 30) then
+       
+                set fine_amt := daycnt * 50;
+           
+                 insert into Fine(Roll_no,sDate,Amt) values (rno,now(),fine_amt);
+                                                   
+                 update Borrower set status = 'R' where Roll_no = rno;
+                 
+         else
+         
+                          update Borrower set status = 'R' where Roll_no = rno;
+               
+         end if;    
+
+     end;
+//
+
+delimiter ;
+
+
++-------------+-------------+------+-----+---------+-------+
+| Field       | Type        | Null | Key | Default | Extra |
++-------------+-------------+------+-----+---------+-------+
+| Roll_no     | int         | NO   | PRI | NULL    |       |
+| name        | varchar(20) | YES  |     | NULL    |       |
+| Dateofissue | date        | YES  |     | NULL    |       |
+| book        | varchar(20) | YES  |     | NULL    |       |
+| status      | varchar(5)  | YES  |     | NULL    |       |
++-------------+-------------+------+-----+---------+-------+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical no: 05
+Title : Write a PL/SQL code block to calculate the area of a circle for a value of radius varying from 5 to 9. Store
+the radius and the corresponding values of calculated area in an empty table named areas, consisting of two columns, radius and area.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+PL CODE:
+
+drop procedure if exists Find_Circle_Area;
+
+delimiter //
+ 
+create procedure Find_Circle_Area()
+BEGIN
+declare r int;
+declare a float;
+
+set r = 5;
+    loop_label:  LOOP
+        IF  r > 9 THEN
+            LEAVE  loop_label;
+        END  IF;
+           
+        set a = 3.14 * r * r;
+           insert into tbl_area(radius,area) values(r,a);
+           
+           set r = r + 1;
+       
+    END LOOP;
+
+END;
+ 
+ //
+
+delimiter ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Practical no : 06 
+Title : Write a Stored Procedure namely proc_Grade for the categorisation of student. If marks scored by
+students in examination is <=1500 and marks>=990 then student will be placed in distinction category if marks scored are between 989 and 900 category is first class, if marks 899 and 825 category is Higher Second Class.
+
+Write a PL/SQLblock to use procedure created with above requirement. Stud_Marks(rollno,name, total_marks)
+Result(rollno,Name, Class)
+
+PL SQL Code :
+
+drop procedure if exists proc_Grade;
+
+    delimiter //
+
+    create procedure proc_Grade()
+    begin
+        DECLARE done INT default  0;
+
+        declare s_marks int;
+        declare s_rollno int;
+        declare s_name varchar(30);
+        declare s_class varchar(30);
+
+        declare s_student cursor For Select  rollno, name, marks from stud_marks;
+
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+
+         open s_student;
+   
+     read_loop: LOOP
+              fetch s_student  into s_rollno,s_name,s_marks;
+
+    IF done = 1 THEN
+          LEAVE read_loop;
+    END IF;
+
+         if(s_marks<=1500 and s_marks>=990) then
+             set s_class='Distinction';
+
+        elseif(s_marks<=989 and s_marks>=900) then
+             set s_class='First Class';
+       
+        elseif (s_marks<=899 and s_marks>=825) then
+            set s_class='Higher Second Class';
+
+    else
+     set s_class='Pass';
+
+    end if;
+     insert into Result(rollno,name,class)values(s_rollno,s_name,s_class);
+
+  END LOOP;
+         close s_student;
+         end;
+//
+
+delimiter ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Assignment no : 07
+Write a PL/SQL block of code using parameterized Cursor that will merge the data available in the newly
+created table N_Roll Call with the data available in the table  O_RollCall. If the data in the first table already exist in the second table then that data should be skipped.
+
+PL SQL Code :
+
+drop procedure if exists mycursor1;
+
+delimiter //
+
+CREATE PROCEDURE mycursor1()
+BEGIN
+    DECLARE done INT DEFAULT 0;
+    DECLARE  c_rollno int;
+    DECLARE  c_name char(20);
+
+    DECLARE  c_studentN CURSOR  for SELECT rollno,name FROM O_RollCall where rollno not in(select rollno from N_RollCall);
+
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = 1;
+
+    BEGIN
+        OPEN c_studentN;
+           read_loop:LOOP
+               FETCH c_studentN into c_rollno, c_name;  
+   
+               IF done = 1 THEN
+                  LEAVE read_loop;
+               END IF;          
+   
+              insert into N_RollCall(rollno,name) values(c_rollno, c_name);
+
+           END LOOP;
+           CLOSE c_studentN;
+    END;
+END;
+
+//
+
+delimiter ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Assignment no : 08
+Title : Database Trigger (All Types: Row level and Statement level triggers, Before and After Triggers).
+Write
+a database trigger on Library table. The System should keep track of
+the records that are being updated or deleted. The old value of updated
+or deleted records should be added in Library_Audit table.
+
+PL SQL Code : 
+drop trigger if exists Make_audit1;
+
+delimiter //
+
+CREATE TRIGGER Make_audit1
+  AFTER DELETE ON lib_book
+  FOR EACH ROW
+BEGIN
+  INSERT INTO lib_Audit (bid, bname, qty)
+  VALUES (OLD.bid, OLD.bname,OLD.qty);
+END;
+//
+
+delimiter ;
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+drop trigger if exists Make_audit2;
+
+delimiter //
+
+CREATE TRIGGER Make_audit2
+  AFTER UPDATE ON lib_book
+  FOR EACH ROW
+BEGIN
+  INSERT INTO lib_Audit (bid, bname, qty)
+  VALUES (OLD.bid, OLD.bname,OLD.qty);
+END;
+//
+
+delimiter ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Program of addition in PL SQL :  
+
+drop procedure if exists addition;
+
+delimiter //
+
+CREATE PROCEDURE addition()
+
+BEGIN
+declare a int;
+declare b int;
+declare c int;
+
+set a := 60;
+set b := 50;
+set c := a + b;
+                       
+
+  select 'PL SQL Addition Program = ' , c as msg;
+  select c as Addition;      
+ 
+END;
+
+//
+
+delimiter ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Assignment no : B 3(Map Reduce)
+
+> db.Stud.insert({Rollno:1,Name:'Ram',Marks:80,Branch:'Computer'});
+WriteResult({ "nInserted" : 1 })
+> db.Stud.insert({Rollno:2,Name:'Ravi',Marks:90,Branch:'Computer'});
+WriteResult({ "nInserted" : 1 })
+> db.Stud.insert({Rollno:3,Name:'Rahul',Marks:70,Branch:'IT'});
+WriteResult({ "nInserted" : 1 })
+> db.Stud.insert({Rollno:4,Name:'Sachin',Marks:60,Branch:'IT'});
+WriteResult({ "nInserted" : 1 })
+> db.Stud.find().pretty();
+{
+    "_id" : ObjectId("66f3a2fdde2b979a90e30284"),
+    "Rollno" : 1,
+    "Name" : "Ram",
+    "Marks" : 80,
+    "Branch" : "Computer"
+}
+{
+    "_id" : ObjectId("66f3a30cde2b979a90e30285"),
+    "Rollno" : 2,
+    "Name" : "Ravi",
+    "Marks" : 90,
+    "Branch" : "Computer"
+}
+{
+    "_id" : ObjectId("66f3a323de2b979a90e30286"),
+    "Rollno" : 3,
+    "Name" : "Rahul",
+    "Marks" : 70,
+    "Branch" : "IT"
+}
+{
+    "_id" : ObjectId("66f3a33fde2b979a90e30287"),
+    "Rollno" : 4,
+    "Name" : "Sachin",
+    "Marks" : 60,
+    "Branch" : "IT"
+}
+> db.Stud.mapReduce(
+... function(){emit(this.Branch,this.Marks);},
+... function(key,values){ return Array.sum(values)},
+... {
+...    query : {"Marks":{$gt:60}},
+...    out : "Total_Marks"
+... }
+... );
+{
+    "result" : "Total_Marks",
+    "timeMillis" : 77,
+    "counts" : {
+        "input" : 3,
+        "emit" : 3,
+        "reduce" : 1,
+        "output" : 2
+    },
+    "ok" : 1
+}
+> show collections;
+Employee
+Stud
+Studentdata
+Total_Marks
+system.indexes
+> db.Total_Marks.find().pretty();
+{ "_id" : "Computer", "value" : 170 }
+{ "_id" : "IT", "value" : 70 }
+> db.Stud.mapReduce( function(){emit(this.Branch,this.Marks);}, function(key,values){ return Array.avg(values)}, {    query : {"Marks":{$gt:60}},    out : "Avg_Marks" } );
+{
+    "result" : "Avg_Marks",
+    "timeMillis" : 25,
+    "counts" : {
+        "input" : 3,
+        "emit" : 3,
+        "reduce" : 1,
+        "output" : 2
+    },
+    "ok" : 1
+}
+> db.Avg_Marks.find().pretty();
+{ "_id" : "Computer", "value" : 85 }
+{ "_id" : "IT", "value" : 70 }
+>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Database Connectivity: Write a program to implement Mongo DB database connectivity with any front end language
+to implement Database navigation operations(add, delete, edit etc.)
+// Java Code
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
+import java.util.Scanner;
+
+import static com.mongodb.client.model.Filters.eq;
+
+public class MongoDBCRUD {
+
+private static final String DATABASE_NAME = "sampleDB";
+private static final String COLLECTION_NAME = "Users";
+private static MongoClient mongoClient;
+private static MongoDatabase database;
+private static MongoCollection<Document> collection;
+
+public static void main(String[] args) {
+mongoClient = new MongoClient("localhost", 27017); // Connect to MongoDB
+database = mongoClient.getDatabase(DATABASE_NAME); // Access the database
+collection = database.getCollection(COLLECTION_NAME); // Access the collection
+
+Scanner scanner = new Scanner(System.in);
+int choice;
+
+do {
+System.out.println("\nMongoDB CRUD Operations");
+System.out.println("1. Add User");
+System.out.println("2. Edit User");
+
+System.out.println("3. Delete User");
+System.out.println("4. Display Users");
+System.out.println("0. Exit");
+System.out.print("Enter your choice: ");
+choice = scanner.nextInt();
+scanner.nextLine(); // Consume newline
+
+switch (choice) {
+case 1:
+// Add User
+System.out.print("Enter Name: ");
+String name = scanner.nextLine();
+System.out.print("Enter Age: ");
+int age = scanner.nextInt();
+addUser(name, age);
+break;
+case 2:
+// Edit User
+System.out.print("Enter User ID to Edit: ");
+String idToEdit = scanner.nextLine();
+System.out.print("Enter New Name: ");
+String newName = scanner.nextLine();
+editUser(idToEdit, newName);
+break;
+case 3:
+// Delete User
+System.out.print("Enter User ID to Delete: ");
+String idToDelete = scanner.nextLine();
+deleteUser(idToDelete);
+break;
+case 4:
+// Display Users
+displayUsers();
+break;
+
+case 0:
+System.out.println("Exiting...");
+break;
+default:
+System.out.println("Invalid choice. Please try again.");
+}
+} while (choice != 0);
+
+mongoClient.close(); // Close the connection
+}
+
+private static void addUser(String name, int age) {
+Document document = new Document("Name", name)
+.append("Age", age);
+collection.insertOne(document); // Insert document into collection
+System.out.println("User added successfully!");
+}
+
+private static void editUser(String id, String newName) {
+collection.updateOne(eq("_id", new org.bson.types.ObjectId(id)), new Document("$set", new
+Document("Name", newName)));
+System.out.println("User updated successfully!");
+}
+
+private static void deleteUser(String id) {
+collection.deleteOne(eq("_id", new org.bson.types.ObjectId(id)));
+System.out.println("User deleted successfully!");
+}
+
+private static void displayUsers() {
+for (Document doc : collection.find()) {
+System.out.println(doc.toJson()); // Print each document in JSON format
+}
+}
+
+}
