@@ -1,0 +1,202 @@
+Welcome to the MySQL monitor.  Commands end with ; or \g. mysql -h 192.168.2.232 -u TEB23 -p 
+Your MySQL connection id is 25
+Server version: 9.1.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database tanuja;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use tanuja;
+Database changed
+mysql> create table student_mark(rollno numeric,name varchar(10),marks numeric,branch varchar(10));
+Query OK, 0 rows affected (0.06 sec)
+
+mysql> insert into student_mark values(1,'ravi',90,'computer'),(2,'vedika',70,'computer'),(3,'aarush',95,'it'),(4,'jyoti',60,'IT');
+Query OK, 4 rows affected (0.03 sec)
+Records: 4  Duplicates: 0  Warnings: 0
+
+mysql> select * from student_mark;
++--------+--------+-------+----------+
+| rollno | name   | marks | branch   |
++--------+--------+-------+----------+
+|      1 | ravi   |    90 | computer |
+|      2 | vedika |    70 | computer |
+|      3 | aarush |    95 | it       |
+|      4 | jyoti  |    60 | IT       |
++--------+--------+-------+----------+
+4 rows in set (0.00 sec)
+
+mysql> select * from student_mark where marks>70;
++--------+--------+-------+----------+
+| rollno | name   | marks | branch   |
++--------+--------+-------+----------+
+|      1 | ravi   |    90 | computer |
+|      3 | aarush |    95 | it       |
++--------+--------+-------+----------+
+2 rows in set (0.00 sec)
+
+mysql> select * from student_mark where marks<70;
++--------+-------+-------+--------+
+| rollno | name  | marks | branch |
++--------+-------+-------+--------+
+|      4 | jyoti |    60 | IT     |
++--------+-------+-------+--------+
+1 row in set (0.00 sec)
+
+mysql> update student_mark set name='sachin' where name='ravi';
+Query OK, 1 row affected (0.03 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> > delete from student_mark where name='aarush';
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '> delete from student_mark where name='aarush'' at line 1
+mysql>  delete from student_mark where name='aarush';
+Query OK, 1 row affected (0.03 sec)
+
+mysql> select * from student_mark;
++--------+--------+-------+----------+
+| rollno | name   | marks | branch   |
++--------+--------+-------+----------+
+|      1 | sachin |    90 | computer |
+|      2 | vedika |    70 | computer |
+|      4 | jyoti  |    60 | IT       |
++--------+--------+-------+----------+
+3 rows in set (0.00 sec)
+
+mysql> select max(marks) from student_mark;
++------------+
+| max(marks) |
++------------+
+|         90 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select max(marks) from student_mark where branch='computer';
++------------+
+| max(marks) |
++------------+
+|         90 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select max(marks) from student_mark where branch='IT';
++------------+
+| max(marks) |
++------------+
+|         60 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select min(marks) from student_mark where branch='IT';
++------------+
+| min(marks) |
++------------+
+|         60 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select min(marks) from student_mark where branch='computer';
++------------+
+| min(marks) |
++------------+
+|         70 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select avg(marks) from student_mark where branch='computer';
++------------+
+| avg(marks) |
++------------+
+|    80.0000 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select avg(marks) from student_mark where branch='IT';
++------------+
+| avg(marks) |
++------------+
+|    60.0000 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select sum(marks) from student_mark where branch='computer';
++------------+
+| sum(marks) |
++------------+
+|        160 |
++------------+
+1 row in set (0.00 sec)
+
+mysql> select count(marks) from student_mark where branch='computer';
++--------------+
+| count(marks) |
++--------------+
+|            2 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> select count(marks) from student_mark where branch='IT';
++--------------+
+| count(marks) |
++--------------+
+|            1 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> CREATE TABLE department (
+    ->     branch varchar(10),
+    ->     dept_name varchar(20)
+    -> );
+ERROR 1050 (42S01): Table 'department' already exists
+mysql> INSERT INTO department VALUES
+    -> ('computer', 'Computer Science'),
+    -> ('IT', 'Information Technology'),
+    -> ('ECE', 'Electronics');
+ERROR 1406 (22001): Data too long for column 'dept_name' at row 2
+mysql> SELECT s.rollno, s.name, s.marks, s.branch, d.dept_name
+    -> FROM student_mark s
+    -> LEFT JOIN department d ON s.branch = d.branch;
++--------+--------+-------+----------+-----------+
+| rollno | name   | marks | branch   | dept_name |
++--------+--------+-------+----------+-----------+
+|      1 | sachin |    90 | computer | NULL      |
+|      2 | vedika |    70 | computer | NULL      |
+|      4 | jyoti  |    60 | IT       | NULL      |
++--------+--------+-------+----------+-----------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT s.rollno, s.name, s.marks, s.branch, d.dept_name
+    -> FROM student_mark s
+    -> RIGHT JOIN department d ON s.branch = d.branch;
+Empty set (0.00 sec)
+
+mysql> SELECT s.rollno, s.name, s.marks, s.branch, d.dept_name
+    -> FROM student_mark s
+    -> INNER JOIN department d ON s.branch = d.branch;
+Empty set (0.00 sec)
+
+mysql> SELECT s.rollno, s.name, s.marks, s.branch, d.dept_name
+    -> FROM student_mark s
+    -> LEFT JOIN department d ON s.branch = d.branch
+    ->
+    -> UNION
+    ->
+    -> SELECT s.rollno, s.name, s.marks, s.branch, d.dept_name
+    -> FROM student_mark s
+    -> RIGHT JOIN department d ON s.branch = d.branch;
++--------+--------+-------+----------+-----------+
+| rollno | name   | marks | branch   | dept_name |
++--------+--------+-------+----------+-----------+
+|      1 | sachin |    90 | computer | NULL      |
+|      2 | vedika |    70 | computer | NULL      |
+|      4 | jyoti  |    60 | IT       | NULL      |
++--------+--------+-------+----------+-----------+
+3 rows in set (0.00 sec)
+
+mysql>

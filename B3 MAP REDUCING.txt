@@ -1,0 +1,92 @@
+:~$ mongo
+MongoDB shell version: 2.6.9
+connecting to: test
+> use bill
+switched to db bill
+> db.pay.insert({Cust_ID:"A123",Product:"Milk",Amount:40,Status:"P"});
+WriteResult({ "nInserted" : 1 })
+> db.pay.insert({Cust_ID:"A123",Product:"Parle_G",Amount:50,Status:"NP"});
+WriteResult({ "nInserted" : 1 })
+> db.pay.insert({Cust_ID:"A123",Product:"Lays Chips",Amount:40,Status:"P"});
+WriteResult({ "nInserted" : 1 })
+> db.pay.insert({Cust_ID:"B123",Product:"Mentos",Amount:10,Status:"P"})
+WriteResult({ "nInserted" : 1 })
+> db.pay.insert({Cust_ID:"B123",Product:"Maggie",Amount:60,Status:"NP"});
+WriteResult({ "nInserted" : 1 })
+> db.pay.find()
+{ "_id" : ObjectId("66fe296e986f38d46661386e"), "Cust_ID" : "A123", "Product" : "Milk", "Amount" : 40, "Status" : "P" }
+{ "_id" : ObjectId("66fe2a21986f38d46661386f"), "Cust_ID" : "A123", "Product" : "Parle_G", "Amount" : 50, "Status" : "NP" }
+{ "_id" : ObjectId("66fe2a31986f38d466613870"), "Cust_ID" : "A123", "Product" : "Lays Chips", "Amount" : 40, "Status" : "P" }
+{ "_id" : ObjectId("66fe2a3c986f38d466613871"), "Cust_ID" : "B123", "Product" : "Mentos", "Amount" : 10, "Status" : "P" }
+{ "_id" : ObjectId("66fe2a48986f38d466613872"), "Cust_ID" : "B123", "Product" : "Maggie", "Amount" : 60, "Status" : "NP" }
+> db.pay.find().pretty();
+{
+    "_id" : ObjectId("66fe296e986f38d46661386e"),
+    "Cust_ID" : "A123",
+    "Product" : "Milk",
+    "Amount" : 40,
+    "Status" : "P"
+}
+{
+    "_id" : ObjectId("66fe2a21986f38d46661386f"),
+    "Cust_ID" : "A123",
+    "Product" : "Parle_G",
+    "Amount" : 50,
+    "Status" : "NP"
+}
+{
+    "_id" : ObjectId("66fe2a31986f38d466613870"),
+    "Cust_ID" : "A123",
+    "Product" : "Lays Chips",
+    "Amount" : 40,
+    "Status" : "P"
+}
+{
+    "_id" : ObjectId("66fe2a3c986f38d466613871"),
+    "Cust_ID" : "B123",
+    "Product" : "Mentos",
+    "Amount" : 10,
+    "Status" : "P"
+}
+{
+    "_id" : ObjectId("66fe2a48986f38d466613872"),
+    "Cust_ID" : "B123",
+    "Product" : "Maggie",
+    "Amount" : 60,
+    "Status" : "NP"
+}
+> db.pay.mapReduce(function(){emit(this.Cust_ID,this.Amount);},function(key,values){return Array.sum(values)},{query:{"Status":"NP"},out:"Bill_Amount"})
+{
+    "result" : "Bill_Amount",
+    "timeMillis" : 134,
+    "counts" : {
+   	 "input" : 2,
+   	 "emit" : 2,
+   	 "reduce" : 0,
+   	 "output" : 2
+    },
+    "ok" : 1
+}
+> var mapFunc1=function(){emit(this.Cust_ID,this.Amount);};
+> var reduceFunc1=function(keyCustID,valuePrices){return Array.sum(valuePrices);};
+> db.pay.mapReduce(mapFunc1,reduceFunc1,{out:"Map"})
+{
+    "result" : "Map",
+    "timeMillis" : 2,
+    "counts" : {
+   	 "input" : 5,
+   	 "emit" : 5,
+   	 "reduce" : 2,
+   	 "output" : 2
+    },
+    "ok" : 1
+}
+> db.Bill_Amount.find().pretty();
+{ "_id" : "A123", "value" : 50 }
+{ "_id" : "B123", "value" : 60 }
+> db.Map.find()
+{ "_id" : "A123", "value" : 130 }
+{ "_id" : "B123", "value" : 70 }
+> 
+
+

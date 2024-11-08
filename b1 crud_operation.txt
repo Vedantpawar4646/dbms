@@ -1,0 +1,186 @@
+> use book;
+switched to db book
+> show collections;
+> db.createCollection("library");
+{ "ok" : 1 }
+> db.library.insert({"bid":1,"name":"C++"});
+WriteResult({ "nInserted" : 1 })
+> db.library.insert({"bid":2,"name":"SEPM","author":"Pressman"});
+WriteResult({ "nInserted" : 1 })
+> db.library.insert({"bid":3,"name":"CN","author":"Forouzan","cost":700});
+WriteResult({ "nInserted" : 1 })
+> db.library.find().pretty();
+{ "_id" : ObjectId("66fbd80905d423069247fbbd"), "bid" : 1, "name" : "C++" }
+{
+    "_id" : ObjectId("66fbd81b05d423069247fbbe"),
+    "bid" : 2,
+    "name" : "SEPM",
+    "author" : "Pressman"
+}
+{
+    "_id" : ObjectId("66fbd82a05d423069247fbbf"),
+    "bid" : 3,
+    "name" : "CN",
+    "author" : "Forouzan",
+    "cost" : 700
+}
+> db.library.count();
+3
+> db.library.insert({"bid":4,"name":"SPOS","author":"Pearson","cost":500});
+WriteResult({ "nInserted" : 1 })
+> db.library.insert({"bid":5,"name":"TOC","author":"Addison-Wesley","cost":600});
+WriteResult({ "nInserted" : 1 })
+> db.library.insert({"bid":6,"name":"AI","author":"McGraw Hill Education","cost":800});
+WriteResult({ "nInserted" : 1 })
+> db.library.find().pretty();
+{ "_id" : ObjectId("66fbd80905d423069247fbbd"), "bid" : 1, "name" : "C++" }
+{
+    "_id" : ObjectId("66fbd81b05d423069247fbbe"),
+    "bid" : 2,
+    "name" : "SEPM",
+    "author" : "Pressman"
+}
+{
+    "_id" : ObjectId("66fbd82a05d423069247fbbf"),
+    "bid" : 3,
+    "name" : "CN",
+    "author" : "Forouzan",
+    "cost" : 700
+}
+{
+    "_id" : ObjectId("66fbd85105d423069247fbc0"),
+    "bid" : 4,
+    "name" : "SPOS",
+    "author" : "Pearson",
+    "cost" : 500
+}
+{
+    "_id" : ObjectId("66fbd86605d423069247fbc1"),
+    "bid" : 5,
+    "name" : "TOC",
+    "author" : "Addison-Wesley",
+    "cost" : 600
+}
+{
+    "_id" : ObjectId("66fbd87105d423069247fbc2"),
+    "bid" : 6,
+    "name" : "AI",
+    "author" : "McGraw Hill Education",
+    "cost" : 800
+}
+> db.library.remove({"bid":1});
+WriteResult({ "nRemoved" : 1 })
+> db.library.find().pretty();
+{
+    "_id" : ObjectId("66fbd81b05d423069247fbbe"),
+    "bid" : 2,
+    "name" : "SEPM",
+    "author" : "Pressman"
+}
+{
+    "_id" : ObjectId("66fbd82a05d423069247fbbf"),
+    "bid" : 3,
+    "name" : "CN",
+    "author" : "Forouzan",
+    "cost" : 700
+}
+{
+    "_id" : ObjectId("66fbd85105d423069247fbc0"),
+    "bid" : 4,
+    "name" : "SPOS",
+    "author" : "Pearson",
+    "cost" : 500
+}
+{
+    "_id" : ObjectId("66fbd86605d423069247fbc1"),
+    "bid" : 5,
+    "name" : "TOC",
+    "author" : "Addison-Wesley",
+    "cost" : 600
+}
+{
+    "_id" : ObjectId("66fbd87105d423069247fbc2"),
+    "bid" : 6,
+    "name" : "AI",
+    "author" : "McGraw Hill Education",
+    "cost" : 800
+}
+> db.library.find({$or:[{"cost":500},{"cost":800}]}).pretty()
+{
+    "_id" : ObjectId("66fbd85105d423069247fbc0"),
+    "bid" : 4,
+    "name" : "SPOS",
+    "author" : "Pearson",
+    "cost" : 500
+}
+{
+    "_id" : ObjectId("66fbd87105d423069247fbc2"),
+    "bid" : 6,
+    "name" : "AI",
+    "author" : "McGraw Hill Education",
+    "cost" : 800
+}
+> db.library.find({"cost":{$ne:500}})
+{ "_id" : ObjectId("66fbd81b05d423069247fbbe"), "bid" : 2, "name" : "SEPM", "author" : "Pressman" }
+{ "_id" : ObjectId("66fbd82a05d423069247fbbf"), "bid" : 3, "name" : "CN", "author" : "Forouzan", "cost" : 700 }
+{ "_id" : ObjectId("66fbd86605d423069247fbc1"), "bid" : 5, "name" : "TOC", "author" : "Addison-Wesley", "cost" : 600 }
+{ "_id" : ObjectId("66fbd87105d423069247fbc2"), "bid" : 6, "name" : "AI", "author" : "McGraw Hill Education", "cost" : 800 }
+> db.library.find({$nor:[{"cost":500},{"author":"Forouzan"}]})
+{ "_id" : ObjectId("66fbd81b05d423069247fbbe"), "bid" : 2, "name" : "SEPM", "author" : "Pressman" }
+{ "_id" : ObjectId("66fbd86605d423069247fbc1"), "bid" : 5, "name" : "TOC", "author" : "Addison-Wesley", "cost" : 600 }
+{ "_id" : ObjectId("66fbd87105d423069247fbc2"), "bid" : 6, "name" : "AI", "author" : "McGraw Hill Education", "cost" : 800 }
+> db.library.find({"cost":{$not:{$gt:800}}})
+{ "_id" : ObjectId("66fbd81b05d423069247fbbe"), "bid" : 2, "name" : "SEPM", "author" : "Pressman" }
+{ "_id" : ObjectId("66fbd82a05d423069247fbbf"), "bid" : 3, "name" : "CN", "author" : "Forouzan", "cost" : 700 }
+{ "_id" : ObjectId("66fbd85105d423069247fbc0"), "bid" : 4, "name" : "SPOS", "author" : "Pearson", "cost" : 500 }
+{ "_id" : ObjectId("66fbd86605d423069247fbc1"), "bid" : 5, "name" : "TOC", "author" : "Addison-Wesley", "cost" : 600 }
+{ "_id" : ObjectId("66fbd87105d423069247fbc2"), "bid" : 6, "name" : "AI", "author" : "McGraw Hill Education", "cost" : 800 }
+> db.library.save({"bid":7,"name":"CC","author":"Wiley Publications","cost":400})
+WriteResult({ "nInserted" : 1 })
+> db.library.find().pretty();
+{
+    "_id" : ObjectId("66fbd81b05d423069247fbbe"),
+    "bid" : 2,
+    "name" : "SEPM",
+    "author" : "Pressman"
+}
+{
+    "_id" : ObjectId("66fbd82a05d423069247fbbf"),
+    "bid" : 3,
+    "name" : "CN",
+    "author" : "Forouzan",
+    "cost" : 700
+}
+{
+    "_id" : ObjectId("66fbd85105d423069247fbc0"),
+    "bid" : 4,
+    "name" : "SPOS",
+    "author" : "Pearson",
+    "cost" : 500
+}
+{
+    "_id" : ObjectId("66fbd86605d423069247fbc1"),
+    "bid" : 5,
+    "name" : "TOC",
+    "author" : "Addison-Wesley",
+    "cost" : 600
+}
+{
+    "_id" : ObjectId("66fbd87105d423069247fbc2"),
+    "bid" : 6,
+    "name" : "AI",
+    "author" : "McGraw Hill Education",
+    "cost" : 800
+}
+{
+    "_id" : ObjectId("66fbd8ec05d423069247fbc3"),
+    "bid" : 7,
+    "name" : "CC",
+    "author" : "Wiley Publications",
+    "cost" : 400
+}
+> ^C
+bye
+gescoe@gescoe-OptiPlex-3010:~$
+
+

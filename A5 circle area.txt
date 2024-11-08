@@ -1,0 +1,96 @@
+delimiter //
+ 
+create procedure Find_Circle_Area()
+BEGIN
+declare r int;
+declare a float;
+
+set r = 5;
+    loop_label:  LOOP
+        IF  r > 9 THEN
+            LEAVE  loop_label;
+        END  IF;
+           
+        set a = 3.14 * r * r;
+           insert into tbl_area(radius,area) values(r,a);
+           
+           set r = r + 1;
+       
+    END LOOP;
+
+END;
+ 
+ //
+
+delimiter ;
+
+
+Welcome to the MySQL monitor.  Commands end with ; or \g.  mysql -h 192.168.2.232 -u TEB23 -p 
+Your MySQL connection id is 9
+Server version: 9.1.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database circle;
+Query OK, 1 row affected (0.03 sec)
+
+mysql> use circle;
+Database changed
+mysql> create table tbl_area(radius int,area float);
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> drop procedure if exists Find_Circle_Area;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+mysql>
+mysql> delimiter //
+mysql>
+    -> create procedure Find_Circle_Area()
+    -> BEGIN
+    -> declare r int;
+    -> declare a float;
+    ->
+    -> set r = 5;
+    ->     loop_label:  LOOP
+    ->         IF  r > 9 THEN
+    ->             LEAVE  loop_label;
+    ->         END  IF;
+    ->
+    ->         set a = 3.14 * r * r;
+    ->            insert into tbl_area(radius,area) values(r,a);
+    ->
+    ->            set r = r + 1;
+    ->
+    ->     END LOOP;
+    ->
+    -> END;
+    ->
+    ->  //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql>
+mysql> delimiter ;
+mysql> call Find_Circle_Area();
+Query OK, 1 row affected (0.04 sec)
+
+mysql> ;
+ERROR:
+No query specified
+
+mysql> SELECT * FROM tbl_area;
++--------+--------+
+| radius | area   |
++--------+--------+
+|      5 |   78.5 |
+|      6 | 113.04 |
+|      7 | 153.86 |
+|      8 | 200.96 |
+|      9 | 254.34 |
++--------+--------+
+5 rows in set (0.00 sec)

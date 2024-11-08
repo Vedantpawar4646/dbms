@@ -1,0 +1,172 @@
+> use customer
+switched to db customer
+> db.cust_table.insert({Item_id:1,Cust_Name:"Ram",Product:"Milk",Amount:40});
+WriteResult({ "nInserted" : 1 })
+> db.cust_table.insert({Item_id:2,Cust_Name:"Ram",Product:"Parle_G",Amount:50});
+
+WriteResult({ "nInserted" : 1 })
+> db.cust_table.insert({Item_id:3,Cust_Name:"Mohan",Product:"Lays Chips",Amount:40});
+WriteResult({ "nInserted" : 1 })
+> db.cust_table.insert({Item_id:4,Cust_Name:"Shivam",Product:"Mentos",Amount:10});
+WriteResult({ "nInserted" : 1 })
+> db.cust_table.insert({Item_id:5,Cust_Name:"Mohan",Product:"Maggie",Amount:60});
+WriteResult({ "nInserted" : 1 })
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$sum:"$Amount"}}});
+
+{ "_id" : "Shivam", "total" : 20 }
+{ "_id" : "Mohan", "total" : 200 }
+{ "_id" : "Ram", "total" : 180 }
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$avg:"$Amount"}}});
+{ "_id" : "Shivam", "total" : 10 }
+{ "_id" : "Mohan", "total" : 50 }
+{ "_id" : "Ram", "total" : 45 }
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$min:"$Amount"}}});
+
+{ "_id" : "Shivam", "total" : 10 }
+{ "_id" : "Mohan", "total" : 40 }
+{ "_id" : "Ram", "total" : 40 }
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$max:"$Amount"}}});
+
+{ "_id" : "Shivam", "total" : 10 }
+{ "_id" : "Mohan", "total" : 60 }
+{ "_id" : "Ram", "total" : 50 }
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$first:"$Amount"}}});
+{ "_id" : "Shivam", "total" : 10 }
+{ "_id" : "Mohan", "total" : 40 }
+{ "_id" : "Ram", "total" : 40 }
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$last:"$Amount"}}});
+{ "_id" : "Shivam", "total" : 10 }
+{ "_id" : "Mohan", "total" : 60 }
+{ "_id" : "Ram", "total" : 50 }
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$psuh:"$Amount"}}});
+assert: command failed: {
+    "errmsg" : "exception: unknown group operator '$psuh'",
+    "code" : 15952,
+    "ok" : 0
+} : aggregate failed
+Error: command failed: {
+    "errmsg" : "exception: unknown group operator '$psuh'",
+    "code" : 15952,
+    "ok" : 0
+} : aggregate failed
+	at Error (<anonymous>)
+	at doassert (src/mongo/shell/assert.js:11:14)
+	at Function.assert.commandWorked (src/mongo/shell/assert.js:244:5)
+	at DBCollection.aggregate (src/mongo/shell/collection.js:1149:12)
+	at (shell):1:15
+2024-10-03T10:37:57.624+0530 Error: command failed: {
+    "errmsg" : "exception: unknown group operator '$psuh'",
+    "code" : 15952,
+    "ok" : 0
+} : aggregate failed at src/mongo/shell/assert.js:13
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$sum:1}}});
+{ "_id" : "Shivam", "total" : 2 }
+{ "_id" : "Mohan", "total" : 4 }
+{ "_id" : "Ram", "total" : 4 }
+> db.cust_table.aggregate({$group:{_id:"$Cust_Name","total":{$addToSet:"$Amount"}}});
+{ "_id" : "Shivam", "total" : [ 10 ] }
+{ "_id" : "Mohan", "total" : [ 60, 40 ] }
+{ "_id" : "Ram", "total" : [ 50, 40 ] }
+> db.cust_table.createIndex({'Item_id':1})
+{
+    "createdCollectionAutomatically" : false,
+    "numIndexesBefore" : 1,
+    "numIndexesAfter" : 2,
+    "ok" : 1
+}
+> db.cust_table.createIndex({'Item_id':2})
+{
+    "createdCollectionAutomatically" : false,
+    "numIndexesBefore" : 2,
+    "numIndexesAfter" : 3,
+    "ok" : 1
+}
+> db.cust_table.createIndex({'Item_id':4})
+{
+    "createdCollectionAutomatically" : false,
+    "numIndexesBefore" : 3,
+    "numIndexesAfter" : 4,
+    "ok" : 1
+}
+> db.cust_table.getIndexes()
+[
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "_id" : 1
+   	 },
+   	 "name" : "_id_",
+   	 "ns" : "customer.cust_table"
+    },
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "Item_id" : 1
+   	 },
+   	 "name" : "Item_id_1",
+   	 "ns" : "customer.cust_table"
+    },
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "Item_id" : 2
+   	 },
+   	 "name" : "Item_id_2",
+   	 "ns" : "customer.cust_table"
+    },
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "Item_id" : 4
+   	 },
+   	 "name" : "Item_id_4",
+   	 "ns" : "customer.cust_table"
+    }
+]
+> db.cust_table.dropIndex({'Item_id':4})
+{ "nIndexesWas" : 4, "ok" : 1 }
+> db.cust_table.dropIndex({'Item_id':1})
+{ "nIndexesWas" : 3, "ok" : 1 }
+> db.cust_table.getIndexes()
+[
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "_id" : 1
+   	 },
+   	 "name" : "_id_",
+   	 "ns" : "customer.cust_table"
+    },
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "Item_id" : 2
+   	 },
+   	 "name" : "Item_id_2",
+   	 "ns" : "customer.cust_table"
+    }
+]
+> db.cust_table.getIndexes().pretty();
+2024-10-03T10:40:07.733+0530 TypeError: Object [object Object],[object Object] has no method 'pretty'
+> db.cust_table.getIndexes()
+[
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "_id" : 1
+   	 },
+   	 "name" : "_id_",
+   	 "ns" : "customer.cust_table"
+    },
+    {
+   	 "v" : 1,
+   	 "key" : {
+   		 "Item_id" : 2
+   	 },
+   	 "name" : "Item_id_2",
+   	 "ns" : "customer.cust_table"
+    }
+]
+>
+
+
